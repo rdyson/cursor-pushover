@@ -1,6 +1,6 @@
 # cursor-pushover
 
-Send Cursor completion notifications on macOS to Pushover for mobile notifications.
+Send Cursor completion notifications on macOS to [Pushover](https://pushover.net) for mobile notifications.
 
 ## Files
 
@@ -13,7 +13,7 @@ Send Cursor completion notifications on macOS to Pushover for mobile notificatio
 
 - `bash`
 - `curl`
-- a Pushover account
+- a Pushover account - 10k free messages/month, $5 one-time purchase for each device you'd like to send notifications to
 - a Pushover app token
 - your Pushover user key
 
