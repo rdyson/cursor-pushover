@@ -1,6 +1,6 @@
 # cursor-pushover
 
-Relay Cursor completion notifications on macOS to Pushover.
+Send Cursor completion notifications on macOS to Pushover for mobile notifications.
 
 ## Files
 
