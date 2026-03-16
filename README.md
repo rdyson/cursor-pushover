@@ -1,6 +1,15 @@
 # cursor-pushover
 
-Send Cursor completion notifications on macOS to [Pushover](https://pushover.net) for mobile notifications.
+Forward Cursor completion notifications on macOS to [Pushover](https://pushover.net) for mobile notifications. Could be adapted for other macOS notifications too.
+
+## Quick setup
+
+1. Clone this repo
+2. Sign up for a Pushover account, configure one target device (like your phone) and get your user key
+3. Create an app in Pushover and get your app token
+4. Add user key and app token to Keychain or env vars (see [Secret setup](#secret-setup))
+5. Run `./cursor-pushover.sh` in a terminal tab
+6. Verify it's working by kicking off a chat in Cursor and hide the app - notifications are not sent if the app is in the foreground.
 
 ## Files
 
