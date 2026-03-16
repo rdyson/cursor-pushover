@@ -1,6 +1,69 @@
 # cursor-pushover
 
-Send Cursor completion notifications on macOS to [Pushover](https://pushover.net) for mobile notifications.
+Send Cursor completion notifications on macOS to [Pushover](https://pushover.net) so you get a push notification on your phone when Cursor finishes.
+
+## What this does
+
+`cursor-pushover.sh` watches macOS notification logs for Cursor notifications, then calls `generic-pushover.sh` to send a Pushover message.
+
+This currently works best when:
+
+- Cursor notifications are enabled
+- Cursor is hidden or in the background while the task runs
+
+## Quick start
+
+### 1. Clone the repo
+
+```zsh
+git clone https://github.com/rdyson/cursor-pushover.git
+cd cursor-pushover
+```
+
+### 2. Add your Pushover secrets
+
+#### Option A: macOS Keychain
+
+```zsh
+security add-generic-password -U -a "$USER" -s PUSHOVER_TOKEN -w 'your-pushover-app-token'
+security add-generic-password -U -a "$USER" -s PUSHOVER_USER -w 'your-pushover-user-key'
+```
+
+#### Option B: environment variables
+
+```zsh
+export PUSHOVER_TOKEN="your-pushover-app-token"
+export PUSHOVER_USER="your-pushover-user-key"
+```
+
+If you want those available in every Terminal session, add them to `~/.zshrc` and reload:
+
+```zsh
+source ~/.zshrc
+```
+
+### 3. Test Pushover directly
+
+```zsh
+./generic-pushover.sh "cursor-pushover test"
+```
+
+You should receive a push notification.
+
+### 4. Start the watcher
+
+```zsh
+./cursor-pushover.sh
+```
+
+### 5. Start a Cursor task, then hide Cursor
+
+After starting the agent task in Cursor:
+
+- hide Cursor with `Cmd-H`, or
+- switch to another app / desktop
+
+When Cursor finishes and macOS posts the notification, `cursor-pushover.sh` should relay it to Pushover.
 
 ## Files
 
@@ -23,39 +86,23 @@ Send Cursor completion notifications on macOS to [Pushover](https://pushover.net
 - Cursor notifications enabled
 - access to the macOS `log` command
 
-## Secret setup
+## Where to get your Pushover values
 
-### Option 1: environment variables
+In Pushover:
 
-```zsh
-export PUSHOVER_TOKEN="your-pushover-app-token"
-export PUSHOVER_USER="your-pushover-user-key"
-```
+- `PUSHOVER_USER` = your **User Key**
+- `PUSHOVER_TOKEN` = your application's **API Token/Key**
 
-If you use Zsh, you can put those in `~/.zshrc` and reload it:
+## Secret setup details
 
-```zsh
-source ~/.zshrc
-```
+`generic-pushover.sh` loads secrets in this order:
 
-### Option 2: macOS Keychain
+1. environment variables
+2. macOS Keychain
 
-`generic-pushover.sh` can read secrets from Keychain.
-
-```zsh
-security add-generic-password -U -a "$USER" -s PUSHOVER_TOKEN -w 'your-pushover-app-token'
-security add-generic-password -U -a "$USER" -s PUSHOVER_USER -w 'your-pushover-user-key'
-```
-
-Environment variables take precedence over Keychain values.
+So environment variables override Keychain values if both are present.
 
 ## Usage
-
-Make the scripts executable:
-
-```zsh
-chmod +x ./generic-pushover.sh ./cursor-pushover.sh
-```
 
 ### Send a message directly
 
@@ -112,7 +159,7 @@ On this setup, Cursor only appears to emit the macOS notification when Cursor is
 
 In practice:
 
-1. start the watcher
+1. start `./cursor-pushover.sh`
 2. start your Cursor agent task
 3. hide Cursor or switch to another app
 4. wait for the Pushover notification
@@ -130,6 +177,59 @@ It then:
 - waits for a matching `usernoted` log line
 - debounces events for 2 seconds
 - calls `./generic-pushover.sh`
+
+## Known limitations
+
+- macOS only
+- depends on Cursor posting a macOS system notification when a task finishes
+- on this setup, Cursor needs to be hidden or backgrounded for that notification to appear reliably
+- depends on macOS unified log output from `usernoted`, which could change in a future macOS release
+- bundle-id auto-detection could fail on some installations, in which case you may need to set `CURSOR_BUNDLE_ID` manually
+
+## Troubleshooting
+
+### `./generic-pushover.sh` fails
+
+Check that your secrets are set correctly.
+
+Test environment variables:
+
+```zsh
+echo "$PUSHOVER_TOKEN"
+echo "$PUSHOVER_USER"
+```
+
+Test Keychain values:
+
+```zsh
+security find-generic-password -a "$USER" -s PUSHOVER_TOKEN -w
+security find-generic-password -a "$USER" -s PUSHOVER_USER -w
+```
+
+### `./cursor-pushover.sh` just sits there
+
+That usually means it is waiting for a matching Cursor notification.
+
+Try:
+
+- make sure Cursor notifications are enabled in macOS
+- start a task in Cursor
+- hide Cursor
+- run with debug logging:
+
+```zsh
+DEBUG=1 ./cursor-pushover.sh
+```
+
+### You want to confirm macOS is logging Cursor notifications
+
+Run this manually:
+
+```zsh
+log stream --style compact --info --predicate 'process == "usernoted"'
+```
+
+Then start a Cursor task, hide Cursor, and look for a log line containing Cursor's bundle id.
 
 ## Run at login with launchd
 

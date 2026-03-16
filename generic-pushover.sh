@@ -19,7 +19,7 @@ PUSHOVER_USER="${PUSHOVER_USER:-$(get_keychain_secret PUSHOVER_USER)}"
 
 message="${1:-hello world}"
 
-curl -s \
+curl --fail-with-body -sS \
   --form-string "token=$PUSHOVER_TOKEN" \
   --form-string "user=$PUSHOVER_USER" \
   --form-string "message=$message" \
