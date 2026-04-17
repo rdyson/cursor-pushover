@@ -69,8 +69,6 @@ When Cursor finishes and macOS posts the notification, `cursor-pushover.sh` shou
 
 ### `generic-pushover.sh`
 
-- `bash`
-- `curl`
 - a Pushover account - 10k free messages/month, $5 one-time purchase for each device you'd like to send notifications to
 - a Pushover app token
 - your Pushover user key
