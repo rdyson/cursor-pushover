@@ -6,11 +6,6 @@ Send Cursor completion notifications on macOS to [Pushover](https://pushover.net
 
 `cursor-pushover.sh` watches macOS notification logs for Cursor notifications, then calls `generic-pushover.sh` to send a Pushover message.
 
-This currently works best when:
-
-- Cursor notifications are enabled
-- Cursor is hidden or in the background while the task runs
-
 ## Quick start
 
 ### 1. Clone the repo
